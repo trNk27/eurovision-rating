@@ -1,7 +1,7 @@
 {
-  "name": "Eurovision 2026 — My Ratings",
+  "name": "Eurovision 2026 — My Ranking",
   "short_name": "ESC 2026",
-  "description": "Rate the Eurovision 2026 Grand Final acts 1–10 and see your ranking.",
+  "description": "Drag the Eurovision 2026 Grand Final acts into your preferred ranking.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
