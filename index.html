@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#11071f">
+<title>Eurovision 2026 — My Ratings</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8E%A4%3C/text%3E%3C/svg%3E">
+<style>
+  :root{
+    --bg:#11071f; --bg2:#1d0f33; --card:#241541; --card2:#2e1c52;
+    --line:#3d2a63; --text:#f3edff; --dim:#a99bce; --accent:#ff3da6;
+    --accent2:#7b5cff;
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;}
+  body{
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+    background:linear-gradient(180deg,#1d0f33,#11071f 60%) fixed;
+    color:var(--text); min-height:100vh;
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  header{
+    position:sticky; top:0; z-index:10;
+    background:rgba(17,7,31,.92); backdrop-filter:blur(8px);
+    border-bottom:1px solid var(--line);
+    padding:10px 14px calc(10px) ; padding-top:calc(10px + env(safe-area-inset-top));
+  }
+  .titlerow{display:flex; align-items:baseline; justify-content:space-between; gap:8px;}
+  h1{font-size:18px; margin:0; letter-spacing:.3px;}
+  h1 span{color:var(--accent);}
+  .counter{font-size:13px; color:var(--dim); white-space:nowrap;}
+  nav{display:flex; gap:6px; margin-top:10px;}
+  .tab{
+    flex:1; padding:9px; border:1px solid var(--line); background:var(--card);
+    color:var(--dim); border-radius:10px; font-size:14px; font-weight:600;
+    cursor:pointer;
+  }
+  .tab.on{background:linear-gradient(135deg,var(--accent2),var(--accent)); color:#fff; border-color:transparent;}
+  .editbtn{
+    padding:9px 12px; border:1px solid var(--line); background:var(--card);
+    color:var(--dim); border-radius:10px; font-size:14px; font-weight:600; cursor:pointer;
+  }
+  .editbtn.on{background:#fff; color:#11071f; border-color:#fff;}
+  main{padding:14px; max-width:560px; margin:0 auto;}
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:14px;
+    padding:12px; margin-bottom:12px;
+  }
+  .chead{display:flex; align-items:center; gap:10px;}
+  .no{
+    flex:none; width:26px; height:26px; border-radius:8px; background:var(--bg2);
+    border:1px solid var(--line); display:flex; align-items:center; justify-content:center;
+    font-size:13px; font-weight:700; color:var(--dim);
+  }
+  .flag{font-size:26px; flex:none;}
+  .meta{flex:1; min-width:0;}
+  .country{font-weight:700; font-size:16px;}
+  .sub{font-size:13px; color:var(--dim); margin-top:1px;}
+  .chip{
+    flex:none; width:34px; height:34px; border-radius:9px; color:#fff;
+    display:flex; align-items:center; justify-content:center;
+    font-weight:800; font-size:17px;
+  }
+  .scores{
+    display:grid; grid-template-columns:repeat(5,1fr); gap:7px; margin-top:11px;
+  }
+  .sc{
+    min-height:46px; border-radius:10px; border:1px solid var(--line);
+    background:var(--card2); color:var(--text); font-size:16px; font-weight:700;
+    cursor:pointer;
+  }
+  .sc:active{transform:scale(.94);}
+  .sc.on{color:#fff; border-color:transparent; box-shadow:0 0 0 2px #fff inset;}
+  /* edit mode */
+  .efields{display:grid; gap:7px; margin-top:11px;}
+  .efields input{
+    width:100%; padding:9px 10px; border-radius:9px; border:1px solid var(--line);
+    background:var(--bg2); color:var(--text); font-size:14px;
+  }
+  .eactions{display:flex; gap:7px; margin-top:8px;}
+  .eactions button{
+    padding:9px 10px; border-radius:9px; border:1px solid var(--line);
+    background:var(--card2); color:var(--text); font-size:14px; font-weight:600; cursor:pointer;
+  }
+  .eactions .del{margin-left:auto; color:#ff8a8a; border-color:#5c2b3f;}
+  .add-card{border-style:dashed;}
+  .add-card .ttl{font-weight:700; margin-bottom:9px;}
+  .add-card button{
+    width:100%; margin-top:8px; padding:11px; border-radius:10px; border:none;
+    background:linear-gradient(135deg,var(--accent2),var(--accent)); color:#fff;
+    font-size:15px; font-weight:700; cursor:pointer;
+  }
+  /* ranking */
+  .rank-row{display:flex; align-items:center; gap:10px;}
+  .rank-no{
+    flex:none; width:30px; text-align:center; font-size:18px; font-weight:800;
+    color:var(--dim);
+  }
+  .rank-row.top1 .rank-no{color:#ffd54a;}
+  .rank-row.top2 .rank-no{color:#d8d8e8;}
+  .rank-row.top3 .rank-no{color:#e0a878;}
+  .unrated{opacity:.5;}
+  .stats{
+    text-align:center; color:var(--dim); font-size:13px; margin:2px 0 14px;
+  }
+  .reset{
+    display:block; margin:20px auto 8px; padding:10px 16px; border-radius:10px;
+    background:transparent; border:1px solid var(--line); color:var(--dim);
+    font-size:13px; cursor:pointer;
+  }
+  .empty{text-align:center; color:var(--dim); padding:30px 10px;}
+</style>
+</head>
+<body>
+<header>
+  <div class="titlerow">
+    <h1>Eurovision <span>2026</span></h1>
+    <div class="counter" id="counter"></div>
+  </div>
+  <nav>
+    <button class="tab" data-view="rate">Rate</button>
+    <button class="tab" data-view="rank">Ranking</button>
+    <button class="editbtn" id="editbtn" data-action="toggle-edit">Edit</button>
+  </nav>
+</header>
+<main id="main"></main>
+
+<script>
+"use strict";
+const STORE_KEY = "esc2026";
+
+// Seed list — Eurovision 2026 Grand Final, running order (Vienna, 16 May 2026)
+const DEFAULT_ACTS = [
+  ["🇩🇰","Denmark","Søren Torpegaard Lund","Før Vi Går Hjem"],
+  ["🇩🇪","Germany","Sarah Engels","Fire"],
+  ["🇮🇱","Israel","Noam Bettan","Michelle"],
+  ["🇧🇪","Belgium","Essyla","Dancing on the Ice"],
+  ["🇦🇱","Albania","Alis","Nân"],
+  ["🇬🇷","Greece","Akylas","Ferto"],
+  ["🇺🇦","Ukraine","Leléka","Ridnym"],
+  ["🇦🇺","Australia","Delta Goodrem","Eclipse"],
+  ["🇷🇸","Serbia","Lavina","Kraj Mene"],
+  ["🇲🇹","Malta","Aidan","Bella"],
+  ["🇨🇿","Czechia","Daniel Žižka","Crossroads"],
+  ["🇧🇬","Bulgaria","Dara","Bangaranga"],
+  ["🇭🇷","Croatia","Lelek","Andromeda"],
+  ["🇬🇧","United Kingdom","Look Mum No Computer","Eins, Zwei, Drei"],
+  ["🇫🇷","France","Monroe","Regarde !"],
+  ["🇲🇩","Moldova","Satoshi","Viva, Moldova!"],
+  ["🇫🇮","Finland","Linda Lampenius & Pete Parkkonen","Liekinheitin"],
+  ["🇵🇱","Poland","Alicja","Pray"],
+  ["🇱🇹","Lithuania","Lion Ceccah","Sólo Quiero Más"],
+  ["🇸🇪","Sweden","Felicia","My System"],
+  ["🇨🇾","Cyprus","Antigoni","Jalla"],
+  ["🇮🇹","Italy","Sal Da Vinci","Per Sempre Sì"],
+  ["🇳🇴","Norway","Jonas Lovv","Ya Ya Ya"],
+  ["🇷🇴","Romania","Alexandra Căpitănescu","Choke Me"],
+  ["🇦🇹","Austria","Cosmó","Tanzschein"]
+];
+
+const uid = () => "a" + Math.random().toString(36).slice(2, 9);
+const freshActs = () => DEFAULT_ACTS.map(a => ({
+  id: uid(), flag: a[0], country: a[1], artist: a[2], song: a[3]
+}));
+
+let state;
+function load(){
+  try {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (raw){
+      const s = JSON.parse(raw);
+      if (s && Array.isArray(s.acts)){
+        return { version:1, acts:s.acts, scores:s.scores || {} };
+      }
+    }
+  } catch(e){ /* corrupt storage — fall through to fresh */ }
+  return { version:1, acts: freshActs(), scores:{} };
+}
+function save(){
+  try {
+    localStorage.setItem(STORE_KEY, JSON.stringify({
+      version:1, acts:state.acts, scores:state.scores
+    }));
+  } catch(e){
+    alert("Could not save — storage may be full or blocked.");
+  }
+}
+
+state = load();
+let view = "rate";       // "rate" | "rank"
+let editMode = false;
+
+// score 1..10 -> red→green hue
+const scoreColor = n => `hsl(${Math.round((n-1)/9*130)},68%,46%)`;
+const esc = s => String(s).replace(/[&<>"]/g, c =>
+  ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]));
+const ratedCount = () => state.acts.filter(a => state.scores[a.id]).length;
+
+const main = document.getElementById("main");
+const counterEl = document.getElementById("counter");
+const editBtn = document.getElementById("editbtn");
+
+function render(){
+  counterEl.textContent = ratedCount() + " / " + state.acts.length + " rated";
+  document.querySelectorAll(".tab").forEach(t =>
+    t.classList.toggle("on", t.dataset.view === view));
+  editBtn.classList.toggle("on", editMode);
+  editBtn.style.display = view === "rate" ? "" : "none";
+  main.innerHTML = view === "rate" ? rateHTML() : rankHTML();
+}
+
+function rateHTML(){
+  let html = state.acts.map((act, i) => {
+    const score = state.scores[act.id];
+    const head =
+      `<div class="chead">
+        <span class="no">${i+1}</span>
+        <span class="flag">${esc(act.flag||"🏳️")}</span>
+        <div class="meta">
+          <div class="country">${esc(act.country)}</div>
+          <div class="sub">${esc(act.artist)} — <i>${esc(act.song)}</i></div>
+        </div>
+        ${score ? `<span class="chip" style="background:${scoreColor(score)}">${score}</span>` : ""}
+      </div>`;
+    let body;
+    if (editMode){
+      body =
+        `<div class="efields">
+          <input data-field="flag" data-id="${act.id}" value="${esc(act.flag)}" placeholder="Flag">
+          <input data-field="country" data-id="${act.id}" value="${esc(act.country)}" placeholder="Country">
+          <input data-field="artist" data-id="${act.id}" value="${esc(act.artist)}" placeholder="Artist">
+          <input data-field="song" data-id="${act.id}" value="${esc(act.song)}" placeholder="Song">
+        </div>
+        <div class="eactions">
+          <button data-action="up" data-id="${act.id}">▲</button>
+          <button data-action="down" data-id="${act.id}">▼</button>
+          <button class="del" data-action="del" data-id="${act.id}">✕ Remove</button>
+        </div>`;
+    } else {
+      let btns = "";
+      for (let n=1; n<=10; n++){
+        const on = score === n;
+        btns += `<button class="sc${on?" on":""}" data-action="score" data-id="${act.id}" data-n="${n}"`
+              + (on?` style="background:${scoreColor(n)}"`:"") + `>${n}</button>`;
+      }
+      body = `<div class="scores">${btns}</div>`;
+    }
+    return `<div class="card">${head}${body}</div>`;
+  }).join("");
+
+  if (editMode){
+    html +=
+      `<div class="card add-card">
+        <div class="ttl">+ Add an act</div>
+        <div class="efields">
+          <input id="add-flag" placeholder="Flag (e.g. 🇪🇺)">
+          <input id="add-country" placeholder="Country">
+          <input id="add-artist" placeholder="Artist">
+          <input id="add-song" placeholder="Song">
+        </div>
+        <button data-action="add">Add act</button>
+      </div>
+      <button class="reset" data-action="reset">Reset everything</button>`;
+  }
+  return html;
+}
+
+function rankHTML(){
+  const rated = state.acts.filter(a => state.scores[a.id])
+    .sort((a,b) => state.scores[b.id] - state.scores[a.id]);
+  const unrated = state.acts.filter(a => !state.scores[a.id]);
+
+  let stats;
+  if (rated.length){
+    const avg = rated.reduce((s,a)=>s+state.scores[a.id],0) / rated.length;
+    stats = `<div class="stats">Average ${avg.toFixed(1)} · ${rated.length} rated</div>`;
+  } else {
+    stats = `<div class="empty">No scores yet — switch to <b>Rate</b> and tap a number.</div>`;
+  }
+
+  const row = (act, rankNo, isUnrated) => {
+    const score = state.scores[act.id];
+    const cls = isUnrated ? "unrated"
+      : rankNo===1 ? "top1" : rankNo===2 ? "top2" : rankNo===3 ? "top3" : "";
+    return `<div class="card rank-row ${cls}">
+      <div class="rank-no">${isUnrated ? "–" : rankNo}</div>
+      <span class="flag">${esc(act.flag||"🏳️")}</span>
+      <div class="meta">
+        <div class="country">${esc(act.country)}</div>
+        <div class="sub">${esc(act.artist)} — <i>${esc(act.song)}</i></div>
+      </div>
+      ${isUnrated ? "" : `<span class="chip" style="background:${scoreColor(score)}">${score}</span>`}
+    </div>`;
+  };
+
+  let html = stats;
+  rated.forEach((a,i) => html += row(a, i+1, false));
+  unrated.forEach(a => html += row(a, null, true));
+  return html;
+}
+
+// ---- event handling (delegated) ----
+function actById(id){ return state.acts.find(a => a.id === id); }
+
+main.addEventListener("click", e => {
+  const el = e.target.closest("[data-action]");
+  if (!el) return;
+  const action = el.dataset.action;
+  const id = el.dataset.id;
+
+  if (action === "score"){
+    const n = +el.dataset.n;
+    state.scores[id] = state.scores[id] === n ? undefined : n;
+    if (state.scores[id] === undefined) delete state.scores[id];
+    save(); render();
+
+  } else if (action === "del"){
+    const act = actById(id);
+    if (confirm(`Remove ${act ? act.country : "this act"}?`)){
+      state.acts = state.acts.filter(a => a.id !== id);
+      delete state.scores[id];
+      save(); render();
+    }
+
+  } else if (action === "up" || action === "down"){
+    const idx = state.acts.findIndex(a => a.id === id);
+    const swap = action === "up" ? idx-1 : idx+1;
+    if (swap >= 0 && swap < state.acts.length){
+      const arr = state.acts;
+      [arr[idx], arr[swap]] = [arr[swap], arr[idx]];
+      save(); render();
+    }
+
+  } else if (action === "add"){
+    const get = i => (document.getElementById(i).value || "").trim();
+    const country = get("add-country");
+    if (!country){ alert("Enter at least a country name."); return; }
+    state.acts.push({
+      id: uid(), flag: get("add-flag") || "🏳️",
+      country, artist: get("add-artist"), song: get("add-song")
+    });
+    save(); render();
+
+  } else if (action === "reset"){
+    if (confirm("Reset the act list to the original 25 and erase all scores?")){
+      state = { version:1, acts: freshActs(), scores:{} };
+      editMode = false;
+      save(); render();
+    }
+  }
+});
+
+// inline text edits — update state without re-rendering (keeps input focus)
+main.addEventListener("input", e => {
+  const el = e.target;
+  if (el.dataset.field && el.dataset.id){
+    const act = actById(el.dataset.id);
+    if (act){ act[el.dataset.field] = el.value; save(); }
+  }
+});
+
+document.querySelector("nav").addEventListener("click", e => {
+  const tab = e.target.closest(".tab");
+  if (tab){ view = tab.dataset.view; render(); return; }
+  if (e.target.id === "editbtn"){ editMode = !editMode; render(); }
+});
+
+render();
+</script>
+</body>
+</html>

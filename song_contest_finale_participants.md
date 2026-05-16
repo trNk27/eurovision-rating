@@ -1,0 +1,30 @@
+# Eurovision 2026 Grand Final 🎤
+**Vienna, Wiener Stadthalle — 16 May 2026, 21:00 CEST**
+ 
+| # | Country | Artist | Song |
+|---|---------|--------|------|
+| 1 | 🇩🇰 Denmark | Søren Torpegaard Lund | *Før Vi Går Hjem* |
+| 2 | 🇩🇪 Germany | Sarah Engels | *Fire* |
+| 3 | 🇮🇱 Israel | Noam Bettan | *Michelle* |
+| 4 | 🇧🇪 Belgium | Essyla | *Dancing on the Ice* |
+| 5 | 🇦🇱 Albania | Alis | *Nân* |
+| 6 | 🇬🇷 Greece | Akylas | *Ferto* |
+| 7 | 🇺🇦 Ukraine | Leléka | *Ridnym* |
+| 8 | 🇦🇺 Australia | Delta Goodrem | *Eclipse* |
+| 9 | 🇷🇸 Serbia | Lavina | *Kraj Mene* |
+| 10 | 🇲🇹 Malta | Aidan | *Bella* |
+| 11 | 🇨🇿 Czechia | Daniel Žižka | *Crossroads* |
+| 12 | 🇧🇬 Bulgaria | Dara | *Bangaranga* |
+| 13 | 🇭🇷 Croatia | Lelek | *Andromeda* |
+| 14 | 🇬🇧 United Kingdom | Look Mum No Computer | *Eins, Zwei, Drei* |
+| 15 | 🇫🇷 France | Monroe | *Regarde !* |
+| 16 | 🇲🇩 Moldova | Satoshi | *Viva, Moldova!* |
+| 17 | 🇫🇮 Finland | Linda Lampenius & Pete Parkkonen | *Liekinheitin* |
+| 18 | 🇵🇱 Poland | Alicja | *Pray* |
+| 19 | 🇱🇹 Lithuania | Lion Ceccah | *Sólo Quiero Más* |
+| 20 | 🇸🇪 Sweden | Felicia | *My System* |
+| 21 | 🇨🇾 Cyprus | Antigoni | *Jalla* |
+| 22 | 🇮🇹 Italy | Sal Da Vinci | *Per Sempre Sì* |
+| 23 | 🇳🇴 Norway | Jonas Lovv | *Ya Ya Ya* |
+| 24 | 🇷🇴 Romania | Alexandra Căpitănescu | *Choke Me* |
+| 25 | 🇦🇹 Austria *(host)* | Cosmó | *Tanzschein* |

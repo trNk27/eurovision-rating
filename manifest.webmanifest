@@ -1,0 +1,11 @@
+{
+  "name": "Eurovision 2026 — My Ratings",
+  "short_name": "ESC 2026",
+  "description": "Rate the Eurovision 2026 Grand Final acts 1–10 and see your ranking.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#11071f",
+  "theme_color": "#11071f"
+}
