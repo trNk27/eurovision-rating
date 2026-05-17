@@ -30,7 +30,13 @@
   .titlerow{display:flex; align-items:center; justify-content:space-between; gap:8px;}
   h1{font-size:18px; margin:0; letter-spacing:.3px;}
   h1 span{color:var(--accent);}
-  .hint{margin:7px 0 0; font-size:12.5px; color:var(--dim); line-height:1.4;}
+  nav{display:flex; gap:6px; margin-top:9px;}
+  .tab{
+    flex:1; padding:8px; border:1px solid var(--line); background:var(--card);
+    color:var(--dim); border-radius:9px; font-size:13.5px; font-weight:600; cursor:pointer;
+  }
+  .tab.on{background:linear-gradient(135deg,var(--accent2),var(--accent)); color:#fff; border-color:transparent;}
+  .hint{margin:8px 0 0; font-size:12.5px; color:var(--dim); line-height:1.4;}
   .editbtn{
     flex:none; padding:9px 14px; border:1px solid var(--line); background:var(--card);
     color:var(--dim); border-radius:10px; font-size:14px; font-weight:600; cursor:pointer;
@@ -59,6 +65,7 @@
     border:1px solid var(--line); border-radius:6px; padding:1px 5px; margin-left:4px;
     white-space:nowrap;
   }
+  .pts{font-size:12px; font-weight:800; color:#ffd54a; margin-left:6px; white-space:nowrap;}
   .sub{font-size:13px; color:var(--dim); margin-top:1px;
     overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
   .handle{
@@ -104,6 +111,30 @@
     background:transparent; border:1px solid var(--line); color:var(--dim);
     font-size:13px; cursor:pointer;
   }
+
+  /* compare / results */
+  .summary{
+    text-align:center; padding:16px 14px; margin-bottom:12px;
+    background:var(--card); border:1px solid var(--line); border-radius:14px;
+  }
+  .bigpct{font-size:48px; font-weight:800; line-height:1; color:var(--accent);}
+  .bigpct small{font-size:22px;}
+  .sumlabel{
+    font-size:11px; color:var(--dim); margin-top:3px;
+    letter-spacing:1px; text-transform:uppercase;
+  }
+  .sumline{font-size:13.5px; margin-top:11px; line-height:1.5;}
+  .legend{font-size:11.5px; color:var(--dim); margin-top:7px; line-height:1.5;}
+  .delta{
+    flex:none; min-width:46px; height:36px; border-radius:9px;
+    display:flex; align-items:center; justify-content:center;
+    font-weight:800; font-size:15px;
+  }
+  .delta.exact{background:hsl(142,58%,42%); color:#fff;}
+  .delta.good{background:hsl(110,42%,38%); color:#fff;}
+  .delta.mid{background:hsl(40,78%,50%); color:#3a2a00;}
+  .delta.bad{background:hsl(2,64%,50%); color:#fff;}
+  .delta.bnone{background:var(--card2); color:var(--dim); font-size:18px;}
 </style>
 </head>
 <body>
@@ -112,6 +143,10 @@
     <h1>Eurovision <span>2026</span></h1>
     <button class="editbtn" id="editbtn">Edit</button>
   </div>
+  <nav>
+    <button class="tab" data-view="rank">My Ranking</button>
+    <button class="tab" data-view="compare">Results</button>
+  </nav>
   <p class="hint" id="hint"></p>
 </header>
 <main>
@@ -153,6 +188,13 @@ const DEFAULT_ACTS = [
   ["🇦🇹","Austria","Cosmó","Tanzschein"]
 ];
 
+// Official 2026 Grand Final result, highest first: [running-order #, points]
+const RESULTS = [
+  [12,516],[3,343],[24,296],[8,287],[22,281],[17,279],[1,243],[16,226],
+  [7,221],[6,220],[15,158],[18,150],[5,145],[23,134],[13,124],[11,113],
+  [9,90],[10,89],[21,75],[20,51],[4,36],[19,22],[2,12],[25,6],[14,1]
+];
+
 const uid = () => "a" + Math.random().toString(36).slice(2, 9);
 // `ord` = fixed running-order number (stays put when you re-rank)
 const freshActs = () => DEFAULT_ACTS.map((a, i) => ({
@@ -186,6 +228,7 @@ function save(){
 }
 
 let state = load();
+let view = "rank";          // "rank" | "compare"
 let editMode = false;
 let sortable = null;
 
@@ -197,9 +240,12 @@ const extraEl = document.getElementById("extra");
 const editBtn = document.getElementById("editbtn");
 const hintEl  = document.getElementById("hint");
 
-function cardHTML(act, i){
+const medalClass = r => r===1 ? "gold" : r===2 ? "silver" : r===3 ? "bronze" : "";
+
+/* ---------- My Ranking view ---------- */
+function rankCardHTML(act, i){
   const r = i + 1;
-  const medal = r===1 ? "gold" : r===2 ? "silver" : r===3 ? "bronze" : "";
+  const medal = medalClass(r);
   if (editMode){
     return `<div class="card editing" data-id="${act.id}">
       <div class="rank ${medal}">${r}</div>
@@ -224,13 +270,82 @@ function cardHTML(act, i){
   </div>`;
 }
 
+/* ---------- Results / compare view ---------- */
+function compareData(){
+  const rows = RESULTS.map((r, idx) => {
+    const ord = r[0], points = r[1], officialRank = idx + 1;
+    const i = state.acts.findIndex(a => a.ord === ord);
+    const seed = DEFAULT_ACTS[ord-1] || ["🏳️","?","",""];
+    return {
+      officialRank, points,
+      userRank: i < 0 ? null : i + 1,
+      flag: seed[0], country: seed[1]
+    };
+  });
+  const matched = rows.filter(r => r.userRank != null);
+  const n = matched.length;
+  const exact = matched.filter(r => r.userRank === r.officialRank).length;
+  const sumAbs = matched.reduce((s,r) => s + Math.abs(r.userRank - r.officialRank), 0);
+  const maxAbs = Math.floor(n*n / 2) || 1;          // worst case = fully reversed
+  const accuracy = Math.max(0, Math.round((1 - sumAbs / maxAbs) * 100));
+  return { rows, n, exact, accuracy, winner: rows[0] };
+}
+
+function compareHTML(){
+  const d = compareData();
+  const winnerLine = d.winner.userRank === 1
+    ? "🎉 You called the winner!"
+    : `Winner ${esc(d.winner.country)} — you had it #${d.winner.userRank == null ? "–" : d.winner.userRank}`;
+
+  let html = `<div class="summary">
+    <div class="bigpct">${d.accuracy}<small>%</small></div>
+    <div class="sumlabel">ranking accuracy</div>
+    <div class="sumline">${d.exact} of ${d.n} placed exactly · ${winnerLine}</div>
+    <div class="legend">✓ exact spot &nbsp;·&nbsp; ↑ you rated it higher than it finished &nbsp;·&nbsp; ↓ lower</div>
+  </div>`;
+
+  html += d.rows.map(r => {
+    let badge, bclass;
+    if (r.userRank == null){
+      badge = "—"; bclass = "bnone";
+    } else {
+      const diff = r.userRank - r.officialRank;   // <0 = you rated it higher
+      const m = Math.abs(diff);
+      bclass = m===0 ? "exact" : m<=2 ? "good" : m<=6 ? "mid" : "bad";
+      badge = m===0 ? "✓" : (diff<0 ? "↑" : "↓") + m;
+    }
+    return `<div class="card">
+      <div class="rank ${medalClass(r.officialRank)}">${r.officialRank}</div>
+      <span class="flag">${esc(r.flag)}</span>
+      <div class="meta">
+        <div class="country">${esc(r.country)}<span class="pts">${r.points} pts</span></div>
+        <div class="sub">${r.userRank == null ? "not in your list" : "your ranking: #" + r.userRank}</div>
+      </div>
+      <div class="delta ${bclass}">${badge}</div>
+    </div>`;
+  }).join("");
+  return html;
+}
+
+/* ---------- render ---------- */
 function render(){
+  document.querySelectorAll(".tab").forEach(t =>
+    t.classList.toggle("on", t.dataset.view === view));
+  editBtn.style.display = view === "rank" ? "" : "none";
   editBtn.classList.toggle("on", editMode);
+
+  if (view === "compare"){
+    hintEl.textContent = "Your ranking vs the official Eurovision 2026 result.";
+    if (sortable){ sortable.destroy(); sortable = null; }
+    listEl.innerHTML = compareHTML();
+    extraEl.innerHTML = "";
+    return;
+  }
+
   hintEl.innerHTML = editMode
     ? "<b>Editing</b> — rename, remove or add acts. Drag still works."
     : "Drag the ⠿ handle to rank the acts — <b>#1 is your winner</b>.";
-
-  listEl.innerHTML = state.acts.map(cardHTML).join("");
+  listEl.innerHTML = state.acts.map(rankCardHTML).join("");
   extraEl.innerHTML = editMode
     ? `<div class="addcard">
          <div class="ttl">+ Add an act</div>
@@ -242,7 +357,6 @@ function render(){
        </div>
        <button class="reset" data-action="reset">Reset to running order</button>`
     : "";
-
   initSortable();
 }
 
@@ -265,8 +379,8 @@ function syncOrder(){
   save();
   listEl.querySelectorAll(".card").forEach((c,i) => {
     const rk = c.querySelector(".rank");
-    rk.textContent = i+1;
-    rk.className = "rank " + (i===0?"gold":i===1?"silver":i===2?"bronze":"");
+    rk.textContent = i + 1;
+    rk.className = "rank " + medalClass(i + 1);
   });
 }
 
@@ -312,6 +426,10 @@ document.querySelector("main").addEventListener("input", e => {
   }
 });
 
+document.querySelector("nav").addEventListener("click", e => {
+  const tab = e.target.closest(".tab");
+  if (tab){ view = tab.dataset.view; render(); }
+});
 editBtn.addEventListener("click", () => { editMode = !editMode; render(); });
 
 render();
